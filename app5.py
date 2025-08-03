@@ -34,7 +34,7 @@ if resize_images:
 st.sidebar.markdown("🚧 Save & Share (Coming Soon)")
 
 st.title("🖼️ Image Panel Generator")
-st.write("Built by Adnan Abbas Shah ([syedadnanshahn@yahoo.com](mailto:syedadnanshahn@yahoo.com))")
+st.write("Built by Adnan Abbas Shah")
 
 uploaded_files = st.file_uploader("Upload Images", type=["jpg", "jpeg", "png"], accept_multiple_files=True)
 
