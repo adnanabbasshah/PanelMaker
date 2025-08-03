@@ -120,6 +120,15 @@ st.markdown("""
 📧 [syedadnanshahn@yahoo.com](mailto:syedadnanshahn@yahoo.com)  
 🔗 [LinkedIn](https://www.linkedin.com/in/adnan-abbas-shah/)  
 💻 [GitHub](https://github.com/adnanabbasshah)  
-<a href="https://github.com/adnanabbasshah" target="_blank">
-<img src="https://img.shields.io/github/stars/adnanabbasshah?style=social" alt="GitHub Stars"></a>
-""")
+
+    """
+    <a href="https://github.com/adnanabbasshah" target="_blank">
+        <img src="https://img.shields.io/github/stars/adnanabbasshah?style=social" alt="GitHub Stars">
+    </a>
+    <a href="https://www.linkedin.com/in/adnan-abbas-shah/" target="_blank" style="margin-left: 10px;">
+        <img src="https://img.shields.io/badge/LinkedIn-Connect-blue?logo=linkedin&style=social" alt="LinkedIn">
+    </a>
+    """,
+    unsafe_allow_html=True
+)
+
