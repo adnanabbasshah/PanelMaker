@@ -1,5 +1,5 @@
 import streamlit as st
-from PIL import Image, ImageEnhance
+from PIL import Image
 import os
 import io
 import base64
@@ -8,10 +8,8 @@ import numpy as np
 
 st.set_page_config(page_title="🖼️ Image Panel Maker", layout="wide")
 
-# ---------- Sidebar ---------- #
 st.sidebar.title("⚙️ Settings")
 
-# Theme toggle
 theme = st.sidebar.radio("Theme", ["Light", "Dark"])
 if theme == "Dark":
     st.markdown("""
@@ -21,28 +19,20 @@ if theme == "Dark":
         </style>
     """, unsafe_allow_html=True)
 
-# Image sort option
 sort_option = st.sidebar.selectbox("Sort Images By", ["Upload Order", "Filename"])
-
-# Padding, border
 padding = st.sidebar.slider("Panel Padding (px)", 0, 50, 10)
 border = st.sidebar.checkbox("Add Image Borders")
 corner_radius = st.sidebar.slider("Corner Radius", 0, 30, 5)
 
-# Export format
 export_format = st.sidebar.selectbox("Export Format", ["PNG", "JPG", "PDF"])
-
-# Resize + Aspect Lock
 resize_images = st.sidebar.checkbox("Resize All Images")
 if resize_images:
     target_width = st.sidebar.number_input("Width (px)", 100, 2000, 512)
     target_height = st.sidebar.number_input("Height (px)", 100, 2000, 512)
     lock_aspect = st.sidebar.checkbox("Lock Aspect Ratio")
 
-# Save/share (placeholder)
 st.sidebar.markdown("🚧 Save & Share (Coming Soon)")
 
-# ---------- Main Interface ---------- #
 st.title("🖼️ Image Panel Generator")
 st.write("Built by Adnan Abbas Shah ([syedadnanshahn@yahoo.com](mailto:syedadnanshahn@yahoo.com))")
 
@@ -57,15 +47,11 @@ if uploaded_files:
 
     for idx, file in enumerate(uploaded_files):
         image = Image.open(file).convert("RGBA")
-
-        # Resize logic
         if resize_images:
             if lock_aspect:
                 image.thumbnail((target_width, target_height))
             else:
                 image = image.resize((target_width, target_height))
-
-        # Border
         if border:
             border_size = 5
             new_img = Image.new("RGBA", (image.width + 2*border_size, image.height + 2*border_size), (0, 0, 0, 0))
@@ -76,11 +62,9 @@ if uploaded_files:
         cols[idx % 4].image(image, use_container_width=True, caption=file.name)
 
     if st.button("Generate Panel"):
-        # Create final panel
         widths, heights = zip(*(i.size for i in images))
         total_width = sum(widths) + padding * (len(images) - 1)
         max_height = max(heights)
-
         panel = Image.new("RGBA", (total_width, max_height), (255, 255, 255, 0))
         x_offset = 0
         for im in images:
@@ -98,7 +82,7 @@ if uploaded_files:
             panel.convert("RGB").save(buffered, format="JPEG")
             mime = "image/jpeg"
             file_ext = "jpg"
-        else:  # PDF
+        else:
             pdf = FPDF()
             panel_rgb = panel.convert("RGB")
             temp_path = "temp_image.jpg"
@@ -121,5 +105,11 @@ else:
 
 st.markdown("""
 ---
-🔌 Built with ❤️ by **Adnan Abbas Shah (GIS Developer)**
-""")
+### 👨‍💻 About the Developer  
+📧 [syedadnanshahn@yahoo.com](mailto:syedadnanshahn@yahoo.com)  
+🔗 [LinkedIn](https://www.linkedin.com/in/adnan-abbas-shah/)  
+💻 [GitHub](https://github.com/adnanabbasshah)
+
+<a href="https://github.com/adnanabbasshah" target="_blank">
+<img src="https://img.shields.io/github/stars/adnanabbasshah?style=social" alt="GitHub Stars"></a>
+""", unsafe_allow_html=True)
