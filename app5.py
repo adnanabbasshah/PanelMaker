@@ -37,7 +37,7 @@ rows_choice = st.sidebar.number_input("Rows", 1, 10, 1)
 st.sidebar.markdown("🚧 Drag & Drop, Layout Presets Coming Soon")
 
 st.title("🖼️ Image Panel Generator")
-st.write("Built by Adnan Abbas Shah")
+st.write("Built by Adnan Abbas Shah :syedadnanshahn@yahoo.com")
 
 uploaded_files = st.file_uploader("Upload", type=["jpg", "jpeg", "png"], accept_multiple_files=True)
 
