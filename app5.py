@@ -5,7 +5,8 @@ import io
 import base64
 from fpdf import FPDF
 import numpy as np
-
+from PIL import Image
+Image.MAX_IMAGE_PIXELS = None
 st.set_page_config(page_title="🖼️ Image Panel Maker", layout="wide")
 
 st.sidebar.title("⚙️ Settings")
@@ -128,3 +129,4 @@ with st.sidebar:
         ''',
         unsafe_allow_html=True
     )
+
