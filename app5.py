@@ -5,20 +5,27 @@ import io
 import base64
 from fpdf import FPDF
 import numpy as np
-from PIL import Image
+
+# Allow very large images (disables DecompressionBombError)
 Image.MAX_IMAGE_PIXELS = None
+
+# Page setup
 st.set_page_config(page_title="🖼️ Image Panel Maker", layout="wide")
 
+# Sidebar settings
 st.sidebar.title("⚙️ Settings")
 
 theme = st.sidebar.radio("Theme", ["Light", "Dark"])
 if theme == "Dark":
-    st.markdown("""
+    st.markdown(
+        """
         <style>
         body {background-color: #1e1e1e; color: white;}
         .stButton>button {background-color: #444; color: white;}
         </style>
-    """, unsafe_allow_html=True)
+        """,
+        unsafe_allow_html=True
+    )
 
 sort_option = st.sidebar.selectbox("Sort", ["Upload Order", "Filename"])
 padding = st.sidebar.slider("Padding", 0, 50, 10)
@@ -37,45 +44,64 @@ rows_choice = st.sidebar.number_input("Rows", 1, 10, 1)
 
 st.sidebar.markdown("🚧 Drag & Drop, Layout Presets Coming Soon")
 
+# Title
 st.title("🖼️ Image Panel Generator")
 st.write("Built by Adnan Abbas Shah (syedadnanshahn@yahoo.com) ")
 
-uploaded_files = st.file_uploader("Upload", type=["jpg", "jpeg", "png"], accept_multiple_files=True)
+# File uploader
+uploaded_files = st.file_uploader(
+    "Upload",
+    type=["jpg", "jpeg", "png"],
+    accept_multiple_files=True
+)
 
 if uploaded_files:
+    # Sorting
     if sort_option == "Filename":
         uploaded_files = sorted(uploaded_files, key=lambda x: x.name)
 
     images = []
     captions = []
 
-    for idx, file in enumerate(uploaded_files):
-        image = Image.open(file).convert("RGBA")
+    for file in uploaded_files:
+        try:
+            image = Image.open(file).convert("RGBA")
+        except Exception as e:
+            st.error(f"❌ Could not open {file.name}: {e}")
+            continue
+
         filename = file.name
 
+        # Resize if enabled
         if resize_images:
             if lock_aspect:
                 image.thumbnail((target_width, target_height))
             else:
                 image = image.resize((target_width, target_height))
 
+        # Add border if enabled
         if border:
             border_size = 5
-            new_img = Image.new("RGBA", (image.width + 2*border_size, image.height + 2*border_size), (0, 0, 0, 0))
+            new_img = Image.new(
+                "RGBA",
+                (image.width + 2 * border_size, image.height + 2 * border_size),
+                (0, 0, 0, 0)
+            )
             new_img.paste(image, (border_size, border_size))
             image = new_img
 
+        # Caption input
         caption = st.text_input(f"Caption for {filename}", filename, key=filename)
         captions.append(caption)
         images.append(image)
 
+    # Generate panel
     if st.button("Generate Panel"):
-        panel_width = max([img.width for img in images]) * cols_choice + padding * (cols_choice - 1)
-        panel_height = max([img.height for img in images]) * rows_choice + padding * (rows_choice - 1)
+        panel_width = max(img.width for img in images) * cols_choice + padding * (cols_choice - 1)
+        panel_height = max(img.height for img in images) * rows_choice + padding * (rows_choice - 1)
 
         panel = Image.new("RGBA", (panel_width, panel_height), (255, 255, 255, 0))
-        x_offset = 0
-        y_offset = 0
+
         for idx, im in enumerate(images):
             col = idx % cols_choice
             row = idx // cols_choice
@@ -83,8 +109,10 @@ if uploaded_files:
             y_offset = row * (im.height + padding)
             panel.paste(im, (x_offset, y_offset))
 
+        # Preview in app
         st.image(panel, caption="Panel Preview", use_container_width=True)
 
+        # Export
         buffered = io.BytesIO()
         if export_format == "PNG":
             panel.save(buffered, format="PNG")
@@ -94,7 +122,7 @@ if uploaded_files:
             panel.convert("RGB").save(buffered, format="JPEG")
             mime = "image/jpeg"
             file_ext = "jpg"
-        else:
+        else:  # PDF
             pdf = FPDF()
             panel_rgb = panel.convert("RGB")
             temp_path = "temp_image.jpg"
@@ -109,12 +137,15 @@ if uploaded_files:
             os.remove(temp_path)
             st.stop()
 
+        # Download link
         b64 = base64.b64encode(buffered.getvalue()).decode()
         href = f'<a href="data:{mime};base64,{b64}" download="panel.{file_ext}">💾 Download Panel</a>'
         st.markdown(href, unsafe_allow_html=True)
+
 else:
     st.info("👆 Upload images to start.")
 
+# Sidebar footer
 with st.sidebar:
     st.markdown("### 🔗 Connect with me")
     st.markdown(
@@ -129,4 +160,3 @@ with st.sidebar:
         ''',
         unsafe_allow_html=True
     )
-
