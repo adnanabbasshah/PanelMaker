@@ -72,7 +72,12 @@ if uploaded_files:
 
         filename = file.name
 
-        # Resize if enabled
+        # Auto downscale if image too large
+        max_safe_size = 4000  # max width or height
+        if image.width > max_safe_size or image.height > max_safe_size:
+            image.thumbnail((max_safe_size, max_safe_size))
+
+        # Manual resize (if user enabled)
         if resize_images:
             if lock_aspect:
                 image.thumbnail((target_width, target_height))
