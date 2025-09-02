@@ -115,7 +115,7 @@ if uploaded_files:
             panel.paste(im, (x_offset, y_offset))
 
         # Preview in app
-        st.image(panel, caption="Panel Preview", width=stretch)
+        st.image(panel, caption="Panel Preview", width=True)
 
         # Export
         buffered = io.BytesIO()
@@ -165,5 +165,6 @@ with st.sidebar:
         ''',
         unsafe_allow_html=True
     )
+
 
 
