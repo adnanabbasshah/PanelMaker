@@ -30,7 +30,7 @@ if theme == "Dark":
 sort_option = st.sidebar.selectbox("Sort", ["Upload Order", "Filename"])
 padding = st.sidebar.slider("Padding", 0, 50, 10)
 border = st.sidebar.checkbox("Borders")
-corner_radius = st.sidebar.slider("Corner Radius", 0, 30, 5)
+corner_radius = st.sidebar.slider("Corner Radius", 0, 30, 5)  # not applied yet
 export_format = st.sidebar.selectbox("Export As", ["PNG", "JPG", "PDF"])
 
 resize_images = st.sidebar.checkbox("Resize Images")
@@ -50,7 +50,7 @@ st.write("Built by Adnan Abbas Shah (syedadnanshahn@yahoo.com) ")
 
 # File uploader
 uploaded_files = st.file_uploader(
-    "Upload",
+    "Upload Images",
     type=["jpg", "jpeg", "png"],
     accept_multiple_files=True
 )
@@ -105,7 +105,7 @@ if uploaded_files:
         panel_width = max(img.width for img in images) * cols_choice + padding * (cols_choice - 1)
         panel_height = max(img.height for img in images) * rows_choice + padding * (rows_choice - 1)
 
-        panel = Image.new("RGBA", (panel_width, panel_height), (255, 255, 255, 0))
+        panel = Image.new("RGBA", (panel_width, panel_height), (255, 255, 255, 255))
 
         for idx, im in enumerate(images):
             col = idx % cols_choice
@@ -114,8 +114,9 @@ if uploaded_files:
             y_offset = row * (im.height + padding)
             panel.paste(im, (x_offset, y_offset))
 
-        # Preview in app
-        st.image(panel, caption="Panel Preview", width=True)
+        # ✅ Preview in app (scale safely)
+        preview_width = min(panel.width, 800)  # max preview width
+        st.image(panel, caption="Panel Preview", width=preview_width)
 
         # Export
         buffered = io.BytesIO()
@@ -132,17 +133,21 @@ if uploaded_files:
             panel_rgb = panel.convert("RGB")
             temp_path = "temp_image.jpg"
             panel_rgb.save(temp_path)
+
             pdf.add_page()
+            # Auto-scale to fit A4 width (190mm)
             pdf.image(temp_path, x=10, y=10, w=190)
             pdf.output("panel.pdf")
+
             with open("panel.pdf", "rb") as f:
                 b64 = base64.b64encode(f.read()).decode()
                 href = f'<a href="data:application/pdf;base64,{b64}" download="panel.pdf">📄 Download PDF</a>'
                 st.markdown(href, unsafe_allow_html=True)
+
             os.remove(temp_path)
             st.stop()
 
-        # Download link
+        # Download link for PNG/JPG
         b64 = base64.b64encode(buffered.getvalue()).decode()
         href = f'<a href="data:{mime};base64,{b64}" download="panel.{file_ext}">💾 Download Panel</a>'
         st.markdown(href, unsafe_allow_html=True)
@@ -165,6 +170,3 @@ with st.sidebar:
         ''',
         unsafe_allow_html=True
     )
-
-
-
